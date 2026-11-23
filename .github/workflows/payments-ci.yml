@@ -1,0 +1,42 @@
+﻿name: Payments Microservice CI
+
+on:
+  push:
+    branches:
+      - development
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test and Build Payments
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.4'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Build application
+        run: go build -o payments ./cmd/api
+
+      - name: Upload payments artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: entradasya-ms-payments
+          path: payments
+          retention-days: 7
